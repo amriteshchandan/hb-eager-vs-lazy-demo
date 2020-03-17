@@ -27,13 +27,17 @@ public class EagerLazyDemo {
 			
 			Instructor tempInstructor = session.get(Instructor.class, 5);
 			System.out.println("tempInstructor :: " + tempInstructor);
+			
+			session.getTransaction().commit();
+			session.close();
+			// Will throw org.hibernate.LazyInitializationException
 			List<Course> courses = tempInstructor.getCourses();
 			System.out.println("courses :: " + courses);
-			session.getTransaction().commit();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			session.close();
+			
 			sessionFactory.close();
 		}
 		
