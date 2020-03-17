@@ -5,12 +5,13 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 import com.amritesh.hibernate.entity.demo.Course;
 import com.amritesh.hibernate.entity.demo.Instructor;
 import com.amritesh.hibernate.entity.demo.InstructorDetail;
 
-public class EagerLazyDemo {
+public class FetchJoinDemo {
 
 	public static void main(String[] args) {
 		
@@ -25,17 +26,20 @@ public class EagerLazyDemo {
 			session = sessionFactory.getCurrentSession();
 			session.beginTransaction();
 			
-			Instructor tempInstructor = session.get(Instructor.class, 5);
-			System.out.println("tempInstructor :: " + tempInstructor);
-			List<Course> courses = tempInstructor.getCourses();
-			System.out.println("courses :: " + courses);
+			Query<Instructor> query =
+					session.createQuery("select i from Instructor i "
+							+ "JOIN FETCH i.courses "
+							+ "where i.id=:theInstructorId");
+			query.setParameter("theInstructorId", 5);
+			Instructor instructor = query.getSingleResult();
+//			System.out.println("instructor :: " + instructor);
 			session.getTransaction().commit();
 			session.close();
-			System.out.println("courses :: " + courses);
-			
+			System.out.println("courses :: " + instructor.getCourses());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			
 			sessionFactory.close();
 		}
 		
